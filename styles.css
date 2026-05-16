@@ -23,6 +23,26 @@ body {
   font-size: 17px;
   line-height: 1.4;
   -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+  transition: background 0.3s ease;
+}
+
+body.kind-competition {
+  background: linear-gradient(180deg, #d4ecc6 0%, #bcdfa1 100%);
+  background-attachment: fixed;
+}
+
+body.kind-training {
+  background: linear-gradient(180deg, #c5dba0 0%, #a08566 100%);
+  background-attachment: fixed;
+}
+
+.session-row.kind-competition {
+  background: linear-gradient(180deg, #eaf3dd 0%, #dfecd0 100%);
+}
+
+.session-row.kind-training {
+  background: linear-gradient(180deg, #e2ead0 0%, #c8b297 100%);
 }
 
 .app-header {

@@ -191,6 +191,8 @@ function setSelectedKind(kind) {
     btn.classList.toggle('active', isActive);
     btn.setAttribute('aria-checked', String(isActive));
   });
+  document.body.classList.remove('kind-competition', 'kind-training');
+  document.body.classList.add(`kind-${next}`);
 }
 
 function collectFormData() {
@@ -311,7 +313,8 @@ function renderSessionsList(sessions) {
 
   for (const s of sorted) {
     const li = document.createElement('li');
-    li.className = 'session-row';
+    const kind = sessionKind(s);
+    li.className = `session-row kind-${kind}`;
     li.dataset.sessionId = String(s.id);
 
     const info = document.createElement('div');
@@ -320,7 +323,6 @@ function renderSessionsList(sessions) {
     const dateLine = document.createElement('div');
     dateLine.className = 'session-date';
     dateLine.appendChild(document.createTextNode(formatSessionDate(s.date)));
-    const kind = sessionKind(s);
     const badge = document.createElement('span');
     badge.className = `session-kind-badge ${kind}`;
     badge.textContent = kind === 'training' ? 'TRAIN' : 'COMP';
