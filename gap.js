@@ -169,6 +169,8 @@ function buildGapRow(item, baseline, baselineMeta, bestDetails) {
   return row;
 }
 
+let currentFilter = 'competition';
+
 function renderGap(data) {
   const throwsList = document.getElementById('throws-list');
   const liftsList = document.getElementById('lifts-list');
@@ -179,7 +181,7 @@ function renderGap(data) {
     const baselineRaw = data.baselines ? data.baselines[item.id] : null;
     const baseline = Number.isFinite(baselineRaw) ? baselineRaw : null;
     const baselineMeta = data.baselineMeta ? data.baselineMeta[item.id] : null;
-    const bestDetails = bestSinceReturnDetails(data, item.id);
+    const bestDetails = bestSinceReturnDetails(data, item.id, currentFilter);
     const row = buildGapRow(item, baseline, baselineMeta, bestDetails);
     if (item.category === 'throw') {
       throwsList.appendChild(row);
@@ -189,9 +191,25 @@ function renderGap(data) {
   }
 }
 
+function setFilter(filter) {
+  const next = filter === 'training' ? 'training' : filter === 'all' ? 'all' : 'competition';
+  currentFilter = next;
+  const buttons = document.querySelectorAll('.filter-btn');
+  buttons.forEach((btn) => {
+    const isActive = btn.dataset.filter === next;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-checked', String(isActive));
+  });
+  renderGap(loadData());
+}
+
 function init() {
   const data = loadData();
   renderGap(data);
+
+  document.querySelectorAll('.filter-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setFilter(btn.dataset.filter));
+  });
 }
 
 document.addEventListener('DOMContentLoaded', init);

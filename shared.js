@@ -105,12 +105,19 @@ function todayISO() {
   return `${yyyy}-${mm}-${dd}`;
 }
 
-function bestSinceReturnDetails(data, itemId) {
+function sessionKind(session) {
+  if (!session) return 'competition';
+  return session.kind === 'training' ? 'training' : 'competition';
+}
+
+function bestSinceReturnDetails(data, itemId, filter) {
   if (!data || !Array.isArray(data.sessions)) return null;
+  const requestedKind = filter === 'competition' || filter === 'training' ? filter : null;
   let bestValue = null;
   let bestSession = null;
   for (const session of data.sessions) {
     if (!session || !session.marks) continue;
+    if (requestedKind && sessionKind(session) !== requestedKind) continue;
     const marks = session.marks[itemId];
     if (!Array.isArray(marks)) continue;
     for (const mark of marks) {
@@ -128,11 +135,12 @@ function bestSinceReturnDetails(data, itemId) {
     sessionId: bestSession.id,
     sessionDate: bestSession.date,
     sessionLocation: bestSession.location || null,
+    sessionKind: sessionKind(bestSession),
   };
 }
 
-function bestSinceReturn(data, itemId) {
-  const details = bestSinceReturnDetails(data, itemId);
+function bestSinceReturn(data, itemId, filter) {
+  const details = bestSinceReturnDetails(data, itemId, filter);
   return details ? details.value : null;
 }
 

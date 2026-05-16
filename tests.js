@@ -366,6 +366,73 @@ test('bestSinceReturnDetails: missing location returns null in sessionLocation',
   assertEqual(details.sessionLocation, null);
 });
 
+// --- bestSinceReturnDetails kind filter ---
+
+test('bestSinceReturnDetails: competition filter excludes training sessions', () => {
+  const data = { sessions: [
+    { id: 1, date: '2026-05-10', kind: 'training',    marks: { deadlift: [350] } },
+    { id: 2, date: '2026-05-15', kind: 'competition', marks: { deadlift: [310] } },
+  ] };
+  const details = bestSinceReturnDetails(data, 'deadlift', 'competition');
+  assertEqual(details.value, 310);
+  assertEqual(details.sessionKind, 'competition');
+});
+
+test('bestSinceReturnDetails: training filter excludes competition sessions', () => {
+  const data = { sessions: [
+    { id: 1, date: '2026-05-10', kind: 'training',    marks: { deadlift: [350] } },
+    { id: 2, date: '2026-05-15', kind: 'competition', marks: { deadlift: [310] } },
+  ] };
+  const details = bestSinceReturnDetails(data, 'deadlift', 'training');
+  assertEqual(details.value, 350);
+  assertEqual(details.sessionKind, 'training');
+});
+
+test('bestSinceReturnDetails: all filter includes both kinds', () => {
+  const data = { sessions: [
+    { id: 1, date: '2026-05-10', kind: 'training',    marks: { deadlift: [350] } },
+    { id: 2, date: '2026-05-15', kind: 'competition', marks: { deadlift: [310] } },
+  ] };
+  const details = bestSinceReturnDetails(data, 'deadlift', 'all');
+  assertEqual(details.value, 350);
+});
+
+test('bestSinceReturnDetails: missing kind defaults to competition for filtering', () => {
+  const data = { sessions: [
+    { id: 1, date: '2026-05-10', marks: { deadlift: [320] } },
+  ] };
+  const compDetails = bestSinceReturnDetails(data, 'deadlift', 'competition');
+  assertEqual(compDetails.value, 320);
+  assertEqual(compDetails.sessionKind, 'competition');
+  const trainDetails = bestSinceReturnDetails(data, 'deadlift', 'training');
+  assertEqual(trainDetails, null);
+});
+
+test('bestSinceReturnDetails: competition filter with no matches returns null', () => {
+  const data = { sessions: [
+    { id: 1, date: '2026-05-10', kind: 'training', marks: { deadlift: [350] } },
+  ] };
+  assertEqual(bestSinceReturnDetails(data, 'deadlift', 'competition'), null);
+});
+
+// --- sessionKind helper ---
+
+test('sessionKind: undefined session => competition', () => {
+  assertEqual(sessionKind(undefined), 'competition');
+});
+
+test('sessionKind: explicit training => training', () => {
+  assertEqual(sessionKind({ kind: 'training' }), 'training');
+});
+
+test('sessionKind: missing kind => competition', () => {
+  assertEqual(sessionKind({ id: 1 }), 'competition');
+});
+
+test('sessionKind: unknown kind value => competition', () => {
+  assertEqual(sessionKind({ kind: 'mystery' }), 'competition');
+});
+
 // --- loadData backward compatibility for baselineMeta ---
 
 test('loadData: missing baselineMeta => filled in as empty object', () => {

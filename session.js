@@ -178,10 +178,26 @@ function renderForm(prefillMarks, prefillStoneWeights) {
   }
 }
 
+function getSelectedKind() {
+  const activeBtn = document.querySelector('.kind-btn.active');
+  return activeBtn && activeBtn.dataset.kind === 'training' ? 'training' : 'competition';
+}
+
+function setSelectedKind(kind) {
+  const next = kind === 'training' ? 'training' : 'competition';
+  const buttons = document.querySelectorAll('.kind-btn');
+  buttons.forEach((btn) => {
+    const isActive = btn.dataset.kind === next;
+    btn.classList.toggle('active', isActive);
+    btn.setAttribute('aria-checked', String(isActive));
+  });
+}
+
 function collectFormData() {
   const date = document.getElementById('session-date').value;
   const locationInput = document.getElementById('session-location');
   const location = locationInput && locationInput.value ? locationInput.value.trim() : '';
+  const kind = getSelectedKind();
   const marks = {};
   const stoneWeights = {};
 
@@ -213,7 +229,7 @@ function collectFormData() {
     }
   });
 
-  return { date, location, marks, stoneWeights };
+  return { date, location, kind, marks, stoneWeights };
 }
 
 function totalAttempts(session) {
@@ -250,7 +266,12 @@ function renderSessionsList(sessions) {
 
     const dateLine = document.createElement('div');
     dateLine.className = 'session-date';
-    dateLine.textContent = formatSessionDate(s.date);
+    dateLine.appendChild(document.createTextNode(formatSessionDate(s.date)));
+    const kind = sessionKind(s);
+    const badge = document.createElement('span');
+    badge.className = `session-kind-badge ${kind}`;
+    badge.textContent = kind === 'training' ? 'TRAIN' : 'COMP';
+    dateLine.appendChild(badge);
     info.appendChild(dateLine);
 
     if (s.location) {
@@ -296,6 +317,7 @@ function resetForm() {
   document.getElementById('session-date').value = todayISO();
   const locInput = document.getElementById('session-location');
   if (locInput) locInput.value = '';
+  setSelectedKind('competition');
   renderForm({}, {});
   document.getElementById('save-btn').textContent = 'Save Session';
   document.getElementById('edit-banner').hidden = true;
@@ -310,6 +332,7 @@ function handleEdit(sessionId) {
   document.getElementById('session-date').value = session.date;
   const locInput = document.getElementById('session-location');
   if (locInput) locInput.value = session.location || '';
+  setSelectedKind(session.kind || 'competition');
   renderForm(session.marks, session.stoneWeights || {});
   document.getElementById('save-btn').textContent = 'Update Session';
   document.getElementById('edit-banner-date').textContent = formatSessionDate(session.date);
@@ -373,6 +396,7 @@ function handleSubmit(event) {
         id: editingSessionId,
         date: formData.date,
         location: formData.location || '',
+        kind: formData.kind,
         marks: formData.marks,
         stoneWeights: formData.stoneWeights,
       };
@@ -386,6 +410,7 @@ function handleSubmit(event) {
       id: Date.now(),
       date: formData.date,
       location: formData.location || '',
+      kind: formData.kind,
       marks: formData.marks,
       stoneWeights: formData.stoneWeights,
     };
@@ -400,8 +425,13 @@ function handleSubmit(event) {
 function init() {
   const data = loadData();
   document.getElementById('session-date').value = todayISO();
+  setSelectedKind('competition');
   renderForm({}, {});
   renderSessionsList(data.sessions);
+
+  document.querySelectorAll('.kind-btn').forEach((btn) => {
+    btn.addEventListener('click', () => setSelectedKind(btn.dataset.kind));
+  });
 
   document.getElementById('session-form').addEventListener('submit', handleSubmit);
   document.getElementById('cancel-edit-btn').addEventListener('click', handleCancelEdit);

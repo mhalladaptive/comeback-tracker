@@ -21,6 +21,12 @@
   <main class="container">
     <p class="intro">How close you are, per event and lift, to where you were before.</p>
 
+    <div class="filter-bar" role="radiogroup" aria-label="Filter best by session type">
+      <button type="button" class="filter-btn active" data-filter="competition" role="radio" aria-checked="true">Competition</button>
+      <button type="button" class="filter-btn" data-filter="training" role="radio" aria-checked="false">Training</button>
+      <button type="button" class="filter-btn" data-filter="all" role="radio" aria-checked="false">All</button>
+    </div>
+
     <section class="group">
       <h2>Throws</h2>
       <div class="gap-items" id="throws-list"></div>

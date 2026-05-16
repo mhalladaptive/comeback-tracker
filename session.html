@@ -34,6 +34,13 @@
           <label for="session-location" class="date-label">Location</label>
           <input type="text" id="session-location" class="field date-field" placeholder="optional" />
         </div>
+        <div class="meta-row">
+          <span class="date-label">Type</span>
+          <div class="kind-toggle" role="radiogroup" aria-label="Session type">
+            <button type="button" class="kind-btn active" data-kind="competition" role="radio" aria-checked="true">Competition</button>
+            <button type="button" class="kind-btn" data-kind="training" role="radio" aria-checked="false">Training</button>
+          </div>
+        </div>
       </section>
 
       <section class="group" data-category="throw">
