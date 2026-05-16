@@ -618,6 +618,16 @@ body.gap-page {
   flex-direction: column;
 }
 
+.gap-hint {
+  margin: 0;
+  padding: 0.55rem 1rem 0.7rem;
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-style: italic;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+
 .gap-row {
   padding: 1rem;
   border-bottom: 1px solid var(--border);
