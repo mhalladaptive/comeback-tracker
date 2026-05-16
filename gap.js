@@ -9,7 +9,7 @@ function buildStatSpan(label, value) {
   return wrap;
 }
 
-function buildDetailLine(label, mark, date, location) {
+function buildDetailLine(label, mark, date, location, fallback) {
   const line = document.createElement('div');
   line.className = 'gap-detail-line';
 
@@ -22,13 +22,26 @@ function buildDetailLine(label, mark, date, location) {
   markEl.textContent = mark;
   line.appendChild(markEl);
 
-  const dateText = date ? formatSessionDate(date) : '(no date recorded)';
-  const locText = location && location.trim() ? location : '(no location recorded)';
+  const hasDate = !!date;
+  const hasLocation = !!(location && location.trim());
 
-  const provenance = document.createElement('span');
-  provenance.className = 'detail-provenance';
-  provenance.textContent = ` — ${dateText}, ${locText}`;
-  line.appendChild(provenance);
+  let provenanceText = '';
+  if (hasDate && hasLocation) {
+    provenanceText = ` — ${formatSessionDate(date)}, ${location}`;
+  } else if (hasDate) {
+    provenanceText = ` — ${formatSessionDate(date)}`;
+  } else if (hasLocation) {
+    provenanceText = ` — ${location}`;
+  } else if (fallback) {
+    provenanceText = ` — ${fallback}`;
+  }
+
+  if (provenanceText) {
+    const provenance = document.createElement('span');
+    provenance.className = 'detail-provenance';
+    provenance.textContent = provenanceText;
+    line.appendChild(provenance);
+  }
 
   return line;
 }
@@ -141,12 +154,14 @@ function buildGapRow(item, baseline, baselineMeta, bestDetails) {
 
   const baselineMetaDate = baselineMeta && baselineMeta.date ? baselineMeta.date : null;
   const baselineMetaLoc = baselineMeta && baselineMeta.location ? baselineMeta.location : null;
-  details.appendChild(buildDetailLine('Baseline', baselineText, baselineMetaDate, baselineMetaLoc));
+  const baselineFallback = item.category === 'lift' ? 'pre-2020' : null;
+  details.appendChild(buildDetailLine('Baseline', baselineText, baselineMetaDate, baselineMetaLoc, baselineFallback));
   details.appendChild(buildDetailLine(
     'Best',
     formatMeasurement(best, item.measurementType),
     bestDetails.sessionDate,
-    bestDetails.sessionLocation
+    bestDetails.sessionLocation,
+    null
   ));
 
   row.appendChild(details);
