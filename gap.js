@@ -43,14 +43,19 @@ function buildGapRow(item, baseline, baselineMeta, bestDetails) {
   const name = document.createElement('span');
   name.className = 'gap-item-name';
   name.textContent = item.name;
-  const meta = document.createElement('span');
-  meta.className = 'gap-item-meta';
-  meta.textContent = metaLabel(item);
   header.appendChild(name);
-  header.appendChild(meta);
-  row.appendChild(header);
+
+  function appendMetaToHeader() {
+    const metaSpan = document.createElement('span');
+    metaSpan.className = 'gap-item-meta';
+    metaSpan.textContent = metaLabel(item);
+    header.appendChild(metaSpan);
+  }
 
   if (!Number.isFinite(baseline)) {
+    appendMetaToHeader();
+    row.appendChild(header);
+
     row.classList.add('gap-row--empty');
     const placeholder = document.createElement('p');
     placeholder.className = 'gap-empty';
@@ -62,6 +67,9 @@ function buildGapRow(item, baseline, baselineMeta, bestDetails) {
   const baselineText = formatMeasurement(baseline, item.measurementType);
 
   if (!bestDetails) {
+    appendMetaToHeader();
+    row.appendChild(header);
+
     row.classList.add('gap-row--no-sessions');
     const placeholder = document.createElement('p');
     placeholder.className = 'gap-empty';
@@ -74,6 +82,25 @@ function buildGapRow(item, baseline, baselineMeta, bestDetails) {
   const pct = percentOfBaseline(best, baseline);
   const gap = baseline - best;
   const atOrPast = pct >= 100;
+
+  const headline = document.createElement('span');
+  headline.className = 'gap-headline-stat';
+  if (gap > 0) {
+    const label = document.createElement('span');
+    label.className = 'stat-label';
+    label.textContent = 'gap';
+    headline.appendChild(label);
+    headline.appendChild(document.createTextNode(formatMeasurement(gap, item.measurementType)));
+  } else if (gap === 0) {
+    headline.classList.add('match');
+    headline.textContent = 'matched baseline';
+  } else {
+    headline.classList.add('past');
+    headline.textContent = `+${formatMeasurement(-gap, item.measurementType)} past baseline`;
+  }
+  header.appendChild(headline);
+  row.appendChild(header);
+
   const detailsId = `gap-details-${item.id}`;
 
   const pctBtn = document.createElement('button');
@@ -102,19 +129,10 @@ function buildGapRow(item, baseline, baselineMeta, bestDetails) {
   stats.appendChild(document.createTextNode(' · '));
   stats.appendChild(buildStatSpan('best', formatMeasurement(best, item.measurementType)));
   stats.appendChild(document.createTextNode(' · '));
-  if (gap > 0) {
-    stats.appendChild(buildStatSpan('gap', formatMeasurement(gap, item.measurementType)));
-  } else if (gap === 0) {
-    const matchSpan = document.createElement('span');
-    matchSpan.className = 'gap-stat match';
-    matchSpan.textContent = 'matched baseline';
-    stats.appendChild(matchSpan);
-  } else {
-    const pastSpan = document.createElement('span');
-    pastSpan.className = 'gap-stat past';
-    pastSpan.textContent = `+${formatMeasurement(-gap, item.measurementType)} past baseline`;
-    stats.appendChild(pastSpan);
-  }
+  const metaInStats = document.createElement('span');
+  metaInStats.className = 'gap-stat gap-stat--meta';
+  metaInStats.textContent = metaLabel(item);
+  stats.appendChild(metaInStats);
   row.appendChild(stats);
 
   const details = document.createElement('div');
