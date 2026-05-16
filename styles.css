@@ -29,15 +29,15 @@ body {
 
 body.kind-competition {
   background:
-    linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.65)),
+    linear-gradient(rgba(255, 255, 255, 0.28), rgba(255, 255, 255, 0.32)),
     url('images/grass-field.jpg') center center / cover no-repeat;
   background-attachment: fixed;
 }
 
 body.kind-training {
   background:
-    linear-gradient(rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0.65)),
-    url('images/grass-and-dirt.jpg') center center / cover no-repeat;
+    linear-gradient(rgba(255, 255, 255, 0.45), rgba(255, 255, 255, 0.55)),
+    url('images/training-field.jpg') center center / cover no-repeat;
   background-attachment: fixed;
 }
 
