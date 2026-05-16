@@ -240,6 +240,59 @@ function itemCount(session) {
   return Object.keys(session.marks).length;
 }
 
+function buildSessionDetailsPanel(session, detailsId) {
+  const details = document.createElement('div');
+  details.id = detailsId;
+  details.className = 'session-details';
+
+  let anyLines = false;
+  for (const item of ITEMS) {
+    const marks = session.marks ? session.marks[item.id] : null;
+    if (!Array.isArray(marks) || marks.length === 0) continue;
+
+    anyLines = true;
+    const line = document.createElement('div');
+    line.className = 'session-event-line';
+
+    const nameSpan = document.createElement('span');
+    nameSpan.className = 'session-event-name';
+    nameSpan.textContent = item.name;
+    line.appendChild(nameSpan);
+
+    if (
+      item.capturesStoneWeight &&
+      session.stoneWeights &&
+      Number.isFinite(session.stoneWeights[item.id])
+    ) {
+      const stoneSpan = document.createElement('span');
+      stoneSpan.className = 'session-event-stone';
+      stoneSpan.textContent = ` (${session.stoneWeights[item.id]} lb)`;
+      line.appendChild(stoneSpan);
+    }
+
+    line.appendChild(document.createTextNode(' — '));
+
+    const marksText = marks
+      .map((m) => formatMeasurement(m, item.measurementType))
+      .join(', ');
+    const marksSpan = document.createElement('span');
+    marksSpan.className = 'session-event-marks';
+    marksSpan.textContent = marksText;
+    line.appendChild(marksSpan);
+
+    details.appendChild(line);
+  }
+
+  if (!anyLines) {
+    const placeholder = document.createElement('p');
+    placeholder.className = 'session-details-empty';
+    placeholder.textContent = 'No marks recorded.';
+    details.appendChild(placeholder);
+  }
+
+  return details;
+}
+
 function renderSessionsList(sessions) {
   const listEl = document.getElementById('sessions-list');
   const emptyEl = document.getElementById('sessions-empty');
@@ -292,6 +345,19 @@ function renderSessionsList(sessions) {
 
     const actions = document.createElement('div');
     actions.className = 'session-actions';
+    const detailsId = `session-details-${s.id}`;
+
+    const viewBtn = document.createElement('button');
+    viewBtn.type = 'button';
+    viewBtn.className = 'ghost-btn';
+    viewBtn.textContent = 'View';
+    viewBtn.setAttribute('aria-expanded', 'false');
+    viewBtn.setAttribute('aria-controls', detailsId);
+    viewBtn.addEventListener('click', () => {
+      const expanded = li.classList.toggle('expanded');
+      viewBtn.setAttribute('aria-expanded', String(expanded));
+    });
+    actions.appendChild(viewBtn);
 
     const editBtn = document.createElement('button');
     editBtn.type = 'button';
@@ -308,6 +374,7 @@ function renderSessionsList(sessions) {
     actions.appendChild(deleteBtn);
 
     li.appendChild(actions);
+    li.appendChild(buildSessionDetailsPanel(s, detailsId));
     listEl.appendChild(li);
   }
 }

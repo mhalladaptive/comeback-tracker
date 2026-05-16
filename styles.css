@@ -406,10 +406,49 @@ body {
   border-radius: 10px;
   padding: 0.85rem 1rem;
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   box-shadow: var(--shadow);
+}
+
+.session-details {
+  display: none;
+  flex-basis: 100%;
+  padding-top: 0.75rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.session-row.expanded .session-details {
+  display: block;
+}
+
+.session-event-line {
+  padding: 0.15rem 0;
+}
+
+.session-event-name {
+  color: var(--text);
+  font-weight: 500;
+}
+
+.session-event-stone {
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.session-event-marks {
+  color: var(--text);
+}
+
+.session-details-empty {
+  color: var(--muted);
+  font-style: italic;
+  margin: 0;
 }
 
 .session-info {
